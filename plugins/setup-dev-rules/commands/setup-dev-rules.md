@@ -183,7 +183,7 @@ When the user signals completion, OR when you believe the major themes are cover
 
 ### Output structure for `./dev-rules.md`
 
-The file MUST follow this exact top-level structure, in this order, with these exact headings. Sections 1 and 2 are mandatory and correspond to the maintainer's two buckets. Section 3 is a machine-readable self-check that future Claude sessions can run through. Section 4 is provenance.
+The file MUST follow this exact top-level structure, in this order, with these exact headings. Sections 1 and 2 are mandatory and correspond to the maintainer's two buckets. Section 3 is a machine-readable self-check that future Claude sessions can run through. **Provenance lives in git history, not in this file** — the file is a clean constitutional artifact, and changelog-style history would only bloat it. If the maintainer wants to know "when was this added", `git log` is the answer.
 
 ```markdown
 # dev-rules.md
@@ -260,10 +260,6 @@ Group rules by theme using `###` subheadings (Error Handling, Async, Types, Test
 > Before writing or merging any code, a future Claude Code session must answer YES to all of the following. If any answer is NO, refactor first.
 
 - [ ] (1–5 imperative questions derived from the North Star and Rules. Example: "Did I add a focused unit test for every new branch in this change?")
-
-## 4. Provenance
-
-> Generated via `/setup-dev-rules` on YYYY-MM-DD. The maintainer's sense of beauty, captured in dialogue. Re-run the command to evolve these rules as the project's ideals mature.
 ```
 
 # HARD RULES (these override anything else)
