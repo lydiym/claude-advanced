@@ -200,8 +200,9 @@ Each prohibition takes this form:
   // BAD — from path/to/file.ext:LINE
   [real or distilled snippet]
   ```
+- **✅ [Short name of the ideal]**: [What the right way looks like, in one sentence].
   ```[language]
-  // GOOD — the ideal
+  // GOOD
   [idealized snippet]
   ```
 
