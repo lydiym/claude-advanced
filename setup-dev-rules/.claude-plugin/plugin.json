@@ -1,0 +1,17 @@
+{
+  "name": "setup-dev-rules",
+  "version": "0.1.0",
+  "description": "Uncover the maintainer's sense of beauty and codify it into ./dev-rules.md via a strict, code-driven Socratic dialogue.",
+  "author": {
+    "name": "claude-advanced"
+  },
+  "license": "MIT",
+  "keywords": [
+    "socratic",
+    "code-review",
+    "dev-rules",
+    "ideal-state",
+    "convention",
+    "philosophy"
+  ]
+}
