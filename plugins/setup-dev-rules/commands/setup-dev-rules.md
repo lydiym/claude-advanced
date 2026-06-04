@@ -133,9 +133,9 @@ Maintain a running internal scratchpad (in your reasoning, not as a file) of the
   - **Form A** — anti-pattern only, no ideal shown.
   - **Form B** — anti-pattern + ideal (the default when a paired example is meaningful).
   - **Form C** — ideal only, no specific anti-pattern.
-  - **Form D** — soft guideline with rationale; admits exceptions by design.
+  - **Form D** — free-form rule expressed as prose, no snippet pattern; for multi-sentence rules where the bullet+snippet structure of A/B/C would lose meaning or feel forced.
 
-The form encodes severity: A and B are hard prohibitions (with or without a paired fix), C is a positive rule (hard unless the maintainer says otherwise), D is a soft preference. **The maintainer never has to choose** — you pick the form based on what they said, and confirm in Discipline H only when genuinely ambiguous.
+The form is a **structural** choice (how to express the rule), not a severity marker. A and B are hard prohibitions because they describe an anti-pattern; C is a hard positive rule because it says "always do this"; D is a binding rule whose natural form is prose. **The maintainer never has to choose** — you pick the form based on what the rule actually looks like in their head, and confirm in Discipline H only when genuinely ambiguous.
 
 By Phase 3 you should not need to re-ask anything.
 
@@ -157,7 +157,7 @@ Discipline F is your internal scratchpad. Discipline H is the same capture, **sp
 
 Example:
 
-> *"So far I have heard: (1) the service layer must never import from the transport layer; (2) `any` in TypeScript is forbidden, use `unknown` and narrow; (3) every public function gets a JSDoc block. (1) feels like a North Star — it's a load-bearing architectural principle. (2) is a Form A prohibition — clear, no exceptions, no paired ideal needed. (3) is ambiguous: Form A if JSDoc is non-negotiable, Form D if there are valid narrow exceptions (e.g. trivial private helpers). Which one?"*
+> *"So far I have heard: (1) the service layer must never import from the transport layer; (2) `any` in TypeScript is forbidden, use `unknown` and narrow; (3) every public function gets a JSDoc block. (1) feels like a North Star — it's a load-bearing architectural principle. (2) is a Form A prohibition — clear, no exceptions, no paired ideal needed. (3) is ambiguous: Form A if JSDoc is non-negotiable, Form D if you want to write the exception clause into the rule itself (e.g. 'trivial private helpers are exempt'). Which one?"*
 
 This gives the user continuous, granular confirmation that their words are landing in the right shape and bucket. By the time the final summary in Phase 3 arrives, nothing is a surprise, and the final write is a formality rather than a verdict.
 
@@ -239,19 +239,17 @@ The file MUST follow this exact top-level structure, in this order, with these e
   ```
 ```
 
-### Form D — Soft guideline with rationale (preferences, not absolutes)
+### Form D — Free-form rule (rule expressed as prose)
 
-> Use when the rule holds by default but admits exceptions. The rationale names when an exception is acceptable. Pick this form whenever the maintainer says "usually", "by default", "prefer", "unless there's a reason".
+> Use when the rule is best expressed as prose — multi-sentence, with explicit exception clauses, where the bullet+snippet structure of Forms A/B/C would lose meaning or feel forced. Pick this form when the rule covers a whole architectural area, a workflow, or a layered convention. **The rule is binding; the prose is the rule, not a softener.**
 
 ```markdown
-- **💡 [Imperative rule]**: [Why we prefer this; when an exception is acceptable].
+- **📜 [Rule name]**: [The rule, expressed as a paragraph or two. State the principle, the constraints, and any explicit exception clauses inline. Optional supporting snippet below if it tightens the rule.]
+
+  *(Optional supporting snippet — include only if it tightens the rule.)*
   ```[language]
   // GOOD
-  [idealized snippet]
-  ```
-  ```[language]
-  // BAD — when this preference is violated
-  [real or distilled snippet]
+  [supporting snippet]
   ```
 ```
 
