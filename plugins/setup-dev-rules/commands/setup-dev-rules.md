@@ -205,8 +205,8 @@ The file MUST follow this exact top-level structure, in this order, with these e
 ```markdown
 - **❌ [Anti-pattern name]**: [Why forbidden].
   ```[language]
-  // BAD — from path/to/file.ext:LINE
-  [real or distilled snippet]
+  // BAD (distilled MRE)
+  [self-contained minimal snippet that does not reference any file in this repo]
   ```
 ```
 
@@ -217,8 +217,8 @@ The file MUST follow this exact top-level structure, in this order, with these e
 ```markdown
 - **❌ [Anti-pattern name]**: [Why forbidden].
   ```[language]
-  // BAD — from path/to/file.ext:LINE
-  [real or distilled snippet]
+  // BAD (distilled MRE)
+  [self-contained minimal snippet that does not reference any file in this repo]
   ```
 - **✅ [Ideal name]**: [What the right way looks like, in one sentence].
   ```[language]
@@ -255,12 +255,29 @@ The file MUST follow this exact top-level structure, in this order, with these e
 
 Group rules by theme using `###` subheadings (Error Handling, Async, Types, Tests, API Design, etc.). The 3+ anti-patterns surfaced during the dialogue become Form A or Form B entries.
 
+Snippets in this file MUST be self-contained and MUST NOT reference any specific file in the repository (no filename, no line number). The file outlives the code; only the lesson survives. During the dialogue, the agent may reference `path/to/file.ext:LINE` to anchor a question — that reference is conversation context, not part of the recorded rule.
+
 ## 3. Self-Check Before You Commit
 
 > Before writing or merging any code, a future Claude Code session must answer YES to all of the following. If any answer is NO, refactor first.
 
 - [ ] (1–5 imperative questions derived from the North Star and Rules. Example: "Did I add a focused unit test for every new branch in this change?")
+
+## 4. Open Questions
+
+> Themes the agent surfaced but the maintainer has not yet answered. Captured for the next run of `/setup-dev-rules` — the maintainer may resolve them, rephrase them, or strike them as obsolete. The file must never accumulate dead questions.
+
+Format for each entry:
+
+```markdown
+- **[Priority 1–5, 1 = most urgent] [One-line question, scoped and answerable].** *Surfaced from [context — which file or theme]. Candidate direction: [one sentence, the agent's best guess, clearly labelled as unconfirmed].*
 ```
+
+Rules for this section:
+
+- **Sort by priority.** Most urgent first. The list is read top-down; priority is the ordering, not a tag.
+- **No stale questions.** When `/setup-dev-rules` is re-run, the agent reviews `## 4` line by line. A question is removed if (a) the maintainer has answered it, (b) the underlying code or context has changed enough that the question no longer makes sense, or (c) the maintainer explicitly retires it. The section is not append-only.
+- **Candidate directions are guesses.** They appear to help the next run pick up the thread, but they are not rules. Never lift a candidate direction into `## 1` or `## 2` without an explicit answer from the maintainer in the next dialogue.
 
 # HARD RULES (these override anything else)
 
@@ -275,6 +292,9 @@ Group rules by theme using `###` subheadings (Error Handling, Async, Types, Test
 9. **Never overwrite a prior `dev-rules.md` silently.** Read it, mention it, and ask the user whether to replace, merge, or extend.
 10. **Never use filler.** No "I hope this helps", "Great question!", "Excellent point!". Stay direct.
 11. **Honor user in-flight commands.** `skip`, `done` (and `stop`/`finalize`/`write it`), `back`, and `example` are acted on the moment they appear, without requiring justification, paraphrase, or confirmation. If a `back` revision contradicts a previously confirmed rule, surface the contradiction to the user before proceeding.
+12. **Never bridge or extrapolate.** Two prohibitions in one:
+    - **No inferring unstated preferences.** Do not connect two of the maintainer's stated points with a bridge like "and probably you also want X". If the maintainer has not stated it, ask — do not assume.
+    - **No unconfirmed rules in the file.** A rule lands in `## 1` or `## 2` only if (a) the maintainer stated the underlying preference in answer to a code-driven question, AND (b) the wording was confirmed through Discipline H. In Phase 3, before writing the file, the agent MUST walk every candidate rule through this two-part filter. Anything that fails is dropped, surfaced in the summary as "heard but not confirmed — please rephrase or drop", or moved to `## 4. Open Questions` with `Candidate direction` clearly marked as unconfirmed. A rule that "sounds right" but was never confirmed is forbidden in the file.
 
 # TONE
 
