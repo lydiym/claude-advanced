@@ -126,11 +126,16 @@ You are NOT required to ask about every area. You are required to keep this map 
 
 ### Discipline F — Internal capture
 
-Maintain a running internal scratchpad (in your reasoning, not as a file) of the maintainer's stated ideals. As the dialogue proceeds, classify each settled point into one of three buckets:
+Maintain a running internal scratchpad (in your reasoning, not as a file) of the maintainer's stated ideals. As the dialogue proceeds, classify each settled point into one of **two buckets**, then assign a **form** to every entry that lands in the Rules bucket:
 
-- **North Star** — a philosophical or architectural principle.
-- **Prohibition** — an anti-pattern that must never reappear.
-- **Guideline** — a concrete DO/DON'T with paired code snippets.
+- **North Star** — a philosophical or architectural principle (lives in `## 1`).
+- **Rule** — a concrete code-level rule (lives in `## 2`). For each rule, also record its form:
+  - **Form A** — anti-pattern only, no ideal shown.
+  - **Form B** — anti-pattern + ideal (the default when a paired example is meaningful).
+  - **Form C** — ideal only, no specific anti-pattern.
+  - **Form D** — soft guideline with rationale; admits exceptions by design.
+
+The form encodes severity: A and B are hard prohibitions (with or without a paired fix), C is a positive rule (hard unless the maintainer says otherwise), D is a soft preference. **The maintainer never has to choose** — you pick the form based on what they said, and confirm in Discipline H only when genuinely ambiguous.
 
 By Phase 3 you should not need to re-ask anything.
 
@@ -142,7 +147,7 @@ When a code-driven thread goes cold, or when you sense the maintainer is being d
 - *"Which piece of code are you most embarrassed to show colleagues? Why?"*
 - *"Which file in this repo, if it disappeared tomorrow, would secretly make your day?"*
 
-Treat projective answers as **high-priority signals**. The thing the maintainer is most embarrassed by almost always becomes a Strict Prohibition. The thing they would magic-wand away almost always becomes a North Star principle. Before such an answer enters `dev-rules.md`, **convert it back into code-anchored form**: find the file the maintainer meant, lift a representative snippet from it, and write the rule with that snippet as the BAD example. A rule without an anchor is just opinion.
+Treat projective answers as **high-priority signals**. The thing the maintainer is most embarrassed by almost always becomes a Form A or Form B rule. The thing they would magic-wand away almost always becomes a North Star principle. Before such an answer enters `dev-rules.md`, **convert it back into code-anchored form**: find the file the maintainer meant, lift a representative snippet from it, and write the rule with that snippet as the BAD example. A rule without an anchor is just opinion.
 
 Use projective probes sparingly — at most once or twice per session, and only when the dialogue needs a deeper current.
 
@@ -152,7 +157,7 @@ Discipline F is your internal scratchpad. Discipline H is the same capture, **sp
 
 Example:
 
-> *"So far I have heard: (1) the service layer must never import from the transport layer; (2) `any` in TypeScript is forbidden, use `unknown` and narrow; (3) every public function gets a JSDoc block. The third one — do you want that as a strict rule, or is it more of a guideline? And is the first one a North Star or a Prohibition?"*
+> *"So far I have heard: (1) the service layer must never import from the transport layer; (2) `any` in TypeScript is forbidden, use `unknown` and narrow; (3) every public function gets a JSDoc block. (1) feels like a North Star — it's a load-bearing architectural principle. (2) is a Form A prohibition — clear, no exceptions, no paired ideal needed. (3) is ambiguous: Form A if JSDoc is non-negotiable, Form D if there are valid narrow exceptions (e.g. trivial private helpers). Which one?"*
 
 This gives the user continuous, granular confirmation that their words are landing in the right shape and bucket. By the time the final summary in Phase 3 arrives, nothing is a surprise, and the final write is a formality rather than a verdict.
 
@@ -169,7 +174,7 @@ The user can issue any of the following at any point during the interview. **Hon
 
 When the user signals completion, OR when you believe the major themes are covered and the recent exchanges have been small refinements, do the following in order:
 
-1. **Summarize first.** Produce a 5–8 line summary in three buckets: North Star, Prohibitions, Guidelines. This is the user's **last chance to correct a misunderstanding** before you write the file.
+1. **Summarize first.** Produce a 5–8 line summary in two buckets — **North Star** (principles) and **Rules** (with the form A/B/C/D noted for each). This is the user's **last chance to correct a misunderstanding** before you write the file.
 2. **Wait for confirmation.** The user may say "yes, write it", or they may correct a misquote, add a missed principle, or ask for one more question. Do not write the file before they confirm.
 3. **Write the file.** Create or overwrite `./dev-rules.md` at the repository root using `Write`.
 4. **Read it back.** Show the final file path and the section headings. End with exactly one line:
@@ -178,7 +183,7 @@ When the user signals completion, OR when you believe the major themes are cover
 
 ### Output structure for `./dev-rules.md`
 
-The file MUST follow this exact top-level structure, in this order, with these exact headings. The three required sections (1, 2, 3) are mandatory and correspond to the maintainer's three buckets. Section 4 is a machine-readable self-check that future Claude sessions can run through. Section 5 is provenance.
+The file MUST follow this exact top-level structure, in this order, with these exact headings. Sections 1 and 2 are mandatory and correspond to the maintainer's two buckets. Section 3 is a machine-readable self-check that future Claude sessions can run through. Section 4 is provenance.
 
 ```markdown
 # dev-rules.md
@@ -189,36 +194,76 @@ The file MUST follow this exact top-level structure, in this order, with these e
 
 [3–7 short paragraphs or dense bullet lists. Project philosophy and architectural principles. What "good" looks like at the highest level of abstraction. The maintainer's sense of beauty, in their own words, paraphrased with care.]
 
-## 2. Strict Prohibitions (Anti-patterns)
+## 2. Rules
 
-> Things that MUST NOT appear in this codebase. If you find yourself writing one, stop and refactor.
+> One universal list. Every rule takes one of four forms — pick whichever fits. The agent picks during the interview; the maintainer can add, edit, or rearrange rules by hand using the same forms. No more guessing "does this go in Prohibitions or Guidelines?" — there is only `## 2. Rules`.
 
-Each prohibition takes this form:
+### Form A — Anti-pattern only (no ideal shown)
 
-- **❌ [Short name of the anti-pattern]**: [Why it is forbidden].
+> Use when the GOOD is obvious or context-dependent and a paired example would be boilerplate.
+
+```markdown
+- **❌ [Anti-pattern name]**: [Why forbidden].
   ```[language]
   // BAD — from path/to/file.ext:LINE
   [real or distilled snippet]
   ```
-- **✅ [Short name of the ideal]**: [What the right way looks like, in one sentence].
+```
+
+### Form B — Anti-pattern + ideal (the default)
+
+> Use when a paired example is meaningful. Both sides are copy-pasteable starting points.
+
+```markdown
+- **❌ [Anti-pattern name]**: [Why forbidden].
+  ```[language]
+  // BAD — from path/to/file.ext:LINE
+  [real or distilled snippet]
+  ```
+- **✅ [Ideal name]**: [What the right way looks like, in one sentence].
   ```[language]
   // GOOD
   [idealized snippet]
   ```
+```
 
-Group prohibitions by theme using `###` subheadings (Error Handling, Async, Types, Tests, etc.). The 3+ anti-patterns surfaced during the dialogue become explicit entries here.
+### Form C — Ideal only (no anti-pattern shown)
 
-## 3. Code Guidelines (DOs and DON'Ts)
+> Use for positive-only conventions where there is no specific anti-pattern to call out.
 
-[Concrete rules with paired code examples. Each guideline is a short imperative ("Use X, never Y", "Prefer A over B because…") accompanied by BAD/GOOD fenced snippets. Group by theme with `###` subheadings (HTTP APIs, Database, Testing, Configuration, etc.).]
+```markdown
+- **✅ [Imperative rule]**: [Why this is the way].
+  ```[language]
+  // GOOD
+  [idealized snippet]
+  ```
+```
 
-## 4. Self-Check Before You Commit
+### Form D — Soft guideline with rationale (preferences, not absolutes)
+
+> Use when the rule holds by default but admits exceptions. The rationale names when an exception is acceptable. Pick this form whenever the maintainer says "usually", "by default", "prefer", "unless there's a reason".
+
+```markdown
+- **💡 [Imperative rule]**: [Why we prefer this; when an exception is acceptable].
+  ```[language]
+  // GOOD
+  [idealized snippet]
+  ```
+  ```[language]
+  // BAD — when this preference is violated
+  [real or distilled snippet]
+  ```
+```
+
+Group rules by theme using `###` subheadings (Error Handling, Async, Types, Tests, API Design, etc.). The 3+ anti-patterns surfaced during the dialogue become Form A or Form B entries.
+
+## 3. Self-Check Before You Commit
 
 > Before writing or merging any code, a future Claude Code session must answer YES to all of the following. If any answer is NO, refactor first.
 
-- [ ] (1–5 imperative questions derived from the North Star and Prohibitions. Example: "Did I add a focused unit test for every new branch in this change?")
+- [ ] (1–5 imperative questions derived from the North Star and Rules. Example: "Did I add a focused unit test for every new branch in this change?")
 
-## 5. Provenance
+## 4. Provenance
 
 > Generated via `/setup-dev-rules` on YYYY-MM-DD. The maintainer's sense of beauty, captured in dialogue. Re-run the command to evolve these rules as the project's ideals mature.
 ```
