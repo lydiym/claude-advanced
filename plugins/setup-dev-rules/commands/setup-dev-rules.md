@@ -50,12 +50,12 @@ This is the heart of the workflow. From this point on, you operate under six dis
 
 ### Discipline A — Code is mandatory
 
-You are **PROHIBITED** from asking any question that does not have a code snippet attached. The snippet is EITHER:
+It is **strongly recommended** to accompany a question with a code snippet. The snippet is EITHER:
 
 - A **real excerpt** from the repository, with file path and line numbers (e.g. `src/user_service.py:42–57`), OR
 - A **synthetic example** you write inline that illustrates a recurring pattern you have observed in the repo. The baseline for any synthetic snippet is **widely accepted best practice**, unless the maintainer has already specified a different convention for this project. Do not invent a personal aesthetic; ground the ideal in industry norms and the maintainer's stated wishes.
 
-If you cannot find or generate a snippet for a question, you MUST rephrase the question until you can. There are no abstract questions. There are no "what is our style" questions. There are only "look at *this* code — what should the *ideal* version look like?" questions.
+The deliberate exception is **projective probes** (Discipline G) — questions about hidden preferences, embarrassment, or magic-wand thinking, which are meta by nature and resist snippet attachment. For everything else, the snippet is the difference between a question and a probe: *"look at this code — what should the ideal version look like?"* is a different (and more productive) prompt than *"what is our style?"*
 
 Format every question as:
 
@@ -135,7 +135,7 @@ Maintain a running internal scratchpad (in your reasoning, not as a file) of the
   - **Form C** — ideal only, no specific anti-pattern.
   - **Form D** — free-form rule expressed as prose, no snippet pattern; for multi-sentence rules where the bullet+snippet structure of A/B/C would lose meaning or feel forced.
 
-The form is a **structural** choice (how to express the rule), not a severity marker. A and B are hard prohibitions because they describe an anti-pattern; C is a hard positive rule because it says "always do this"; D is a binding rule whose natural form is prose. **The maintainer never has to choose** — you pick the form based on what the rule actually looks like in their head, and confirm in Discipline H only when genuinely ambiguous.
+The form is a **structural** choice (how the rule is expressed on the page), not a severity marker. A and B are hard prohibitions because they describe an anti-pattern; C is a hard positive rule because it says "always do this"; D is a binding rule whose natural form is prose. **The rule is written in the form that fits its content and resembles it most.**
 
 By Phase 3 you should not need to re-ask anything.
 
@@ -244,9 +244,9 @@ The file MUST follow this exact top-level structure, in this order, with these e
 > Use when the rule is best expressed as prose — multi-sentence, with explicit exception clauses, where the bullet+snippet structure of Forms A/B/C would lose meaning or feel forced. Pick this form when the rule covers a whole architectural area, a workflow, or a layered convention. **The rule is binding; the prose is the rule, not a softener.**
 
 ```markdown
-- **📜 [Rule name]**: [The rule, expressed as a paragraph or two. State the principle, the constraints, and any explicit exception clauses inline. Optional supporting snippet below if it tightens the rule.]
+- **📜 [Rule name]**: [The rule, expressed as a paragraph or two. State the principle, the constraints, and any explicit exception clauses inline.]
 
-  *(Optional supporting snippet — include only if it tightens the rule.)*
+  *(Optional supporting snippet — include only when the prose references a specific shape that would be ambiguous without an example, e.g. a config file structure, a test layout, or a module skeleton.)*
   ```[language]
   // GOOD
   [supporting snippet]
@@ -264,7 +264,7 @@ Group rules by theme using `###` subheadings (Error Handling, Async, Types, Test
 
 # HARD RULES (these override anything else)
 
-1. **Never ask an abstract question.** Every question must have a code snippet (real from the repo, or synthetic you generated) attached.
+1. **Never ask an abstract question about code.** Every question that concerns code style, structure, or pattern must have a code snippet (real from the repo, or synthetic you generated) attached. The deliberate exception is projective probes (Discipline G), which are meta and target hidden preferences.
 2. **One question per turn.** Wait for the user. Always. No exceptions.
 3. **Never pre-empt the user's answer.** Don't say "do you agree?" — let them speak first.
 4. **Never document the current state.** The output is the *ideal* state, not a snapshot of the code.

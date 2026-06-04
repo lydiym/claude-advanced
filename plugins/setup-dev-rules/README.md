@@ -18,7 +18,7 @@ The agent will:
 
 1. **Silently scan** the repository (stack, structure, configs, code, tech debt).
 2. **Open with a brief framing** of the mission.
-3. **Run a code-driven Socratic dialogue** — one question per turn, every question anchored to a real or synthetic code snippet. Every rule in the output is binding; the agent never asks the maintainer to choose "hard or soft" — that is a structural choice the agent makes from context.
+3. **Run a code-driven Socratic dialogue** — one question per turn, every question anchored to a real or synthetic code snippet.
 4. **Surface at least 3 anti-patterns** from the current code, asking the maintainer how each should be written *ideally* in the future.
 5. **Finalize** by writing `./dev-rules.md` at the repository root, structured for machine readability.
 
