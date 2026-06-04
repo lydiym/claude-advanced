@@ -18,7 +18,7 @@ The agent will:
 
 1. **Silently scan** the repository (stack, structure, configs, code, tech debt).
 2. **Open with a brief framing** of the mission.
-3. **Run a code-driven Socratic dialogue** — one question per turn, every question anchored to a real or synthetic code snippet.
+3. **Run a code-driven Socratic dialogue** — one question per turn, every question anchored to a real or synthetic code snippet. Every rule in the output is binding; the agent never asks the maintainer to choose "hard or soft" — that is a structural choice the agent makes from context.
 4. **Surface at least 3 anti-patterns** from the current code, asking the maintainer how each should be written *ideally* in the future.
 5. **Finalize** by writing `./dev-rules.md` at the repository root, structured for machine readability.
 
@@ -27,10 +27,13 @@ The agent will:
 `./dev-rules.md` contains, in order:
 
 1. **The North Star (Our Ideals)** — philosophy and architectural principles.
-2. **Strict Prohibitions (Anti-patterns)** — explicit bans with paired BAD/GOOD snippets.
-3. **Code Guidelines (DOs and DON'Ts)** — concrete rules with paired BAD/GOOD snippets.
-4. **Self-Check Before You Commit** — a checklist future Claude sessions must pass.
-5. **Provenance** — when and how the file was generated.
+2. **Rules** — one universal list. Every rule takes one of four forms:
+   - **Form A** — anti-pattern only, no ideal shown.
+   - **Form B** — anti-pattern + ideal (the default when a paired example is meaningful).
+   - **Form C** — ideal only, no specific anti-pattern.
+   - **Form D** — free-form rule expressed as prose, for multi-sentence rules where the bullet+snippet structure would lose meaning.
+3. **Self-Check Before You Commit** — a checklist future Claude sessions must pass.
+4. **Provenance** — when and how the file was generated.
 
 ## Re-running
 
