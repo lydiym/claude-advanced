@@ -183,7 +183,7 @@ When the user signals completion, OR when you believe the major themes are cover
 
 ### Output structure for `./dev-rules.md`
 
-The file MUST follow this exact top-level structure, in this order, with these exact headings. Sections 1 and 2 are mandatory and correspond to the maintainer's two buckets. Section 3 is a machine-readable self-check that future Claude sessions can run through. **Provenance lives in git history, not in this file** — the file is a clean constitutional artifact, and changelog-style history would only bloat it. If the maintainer wants to know "when was this added", `git log` is the answer.
+The file MUST follow this exact top-level structure, in this order, with these exact headings. Sections 1 and 2 are mandatory and correspond to the maintainer's two buckets. Section 3 is a machine-readable self-check that future Claude sessions can run through. **Do not write a Provenance section** — git history is the canonical record of changes for this file.
 
 ```markdown
 # dev-rules.md

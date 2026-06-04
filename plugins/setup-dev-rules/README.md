@@ -34,8 +34,6 @@ The agent will:
    - **Form D** — free-form rule expressed as prose, for multi-sentence rules where the bullet+snippet structure would lose meaning.
 3. **Self-Check Before You Commit** — a checklist future Claude sessions must pass.
 
-There is no Provenance section in the file. Git history is the canonical provenance — `git log dev-rules.md` shows every change, and the commit message describes what was added or revised. Keeping the file a clean constitutional artifact beats embedding a changelog inside it.
-
 ## Re-running
 
 Run `/setup-dev-rules` again any time the project's ideals mature. If `./dev-rules.md` already exists, the agent will read it, mention its contents, and ask whether to replace, merge, or extend it.
