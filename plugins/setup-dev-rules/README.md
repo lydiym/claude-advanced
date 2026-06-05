@@ -18,8 +18,8 @@ The agent will:
 
 1. **Silently scan** the repository (stack, structure, configs, code, tech debt).
 2. **Open with a brief framing** of the mission.
-3. **Run a code-driven Socratic dialogue** — one question per turn, every question anchored to a real or synthetic code snippet.
-4. **Surface at least 3 anti-patterns** from the current code, asking the maintainer how each should be written *ideally* in the future.
+3. **Run a code-driven Socratic dialogue** — one question per turn, every question anchored to a real or synthetic code snippet. Positive-pattern questions use `AskUserQuestion` to confirm or refine an exemplary snippet; negative-pattern questions stay in Socratic prose to draw out the maintainer's pain.
+4. **Surface at least 3 positive patterns and at least 1 anti-pattern** from the current code — the positive side carries the maintainer's "sense of beauty" and is the main signal, the negative side is required but treated carefully.
 5. **Finalize** by writing `./dev-rules.md` at the repository root, structured for machine readability.
 
 ## Output

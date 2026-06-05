@@ -28,7 +28,7 @@ Scan in this order:
 3. **Configs & infrastructure.** Read `Dockerfile`, `docker-compose.yml`, CI files (`.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`, `.circleci/`), IaC (Terraform, Pulumi, Helm), and any environment templating (`.env.example`, `config/*.yaml`).
 4. **Database & persistence.** Identify the engine, ORM/query layer, migration tool, seed scripts, and connection-pooling conventions.
 5. **Testing strategy.** Locate unit, integration, e2e, and contract tests. Note the framework, fixture style, mock policy.
-6. **Representative code.** Read 3–5 files spanning core domain logic, glue code, error handling, async/concurrency, and tests. Note the patterns and the deviations.
+6. **Representative code.** Read 3–5 files spanning core domain logic, glue code, error handling, async/concurrency, and tests. Note exemplary patterns first (these will become Form C / ✅ in Form B), and deviations second.
 7. **Tech debt on purpose.** Use `Grep` aggressively for: `TODO`, `FIXME`, `HACK`, `XXX`, `as any`, `@ts-ignore`, `@ts-expect-error`, `noqa`, `nolint`, `eslint-disable`, `// FIXME`, `panic!`, `unwrap()`, bare `except:`, `console.log` in non-dev paths, `// ignore`, `// skip`, `it.skip`, `test.skip`, commented-out code, swallowed exceptions, long single-file functions, and copy-paste duplication.
 8. **Existing conventions.** Look for `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `STYLE.md`, PR templates, ADRs (architectural decision records), and any prior `dev-rules.md`.
 
@@ -84,13 +84,30 @@ The maintainer's deletions and additions to your ideal are usually stronger sign
 
 Ask exactly **one** question per turn. Then **stop**. Wait for the user's answer. Do not pre-empt the next question. Do not chain multi-part questions. Do not provide your own answer and ask "do you agree?" — let the maintainer speak first.
 
-### Discipline C — Anti-pattern surfacing is non-optional
+### Discipline C — Pattern surfacing is primary; anti-pattern surfacing is required
 
-At least **3** of your questions must take this form:
+Positive patterns carry the maintainer's "sense of beauty" — they are the main signal `dev-rules.md` must capture. Anti-patterns are useful but secondary, and harder for the maintainer to confront, so they get the Socratic treatment (Discipline A: prose, one question, snippet-anchored) to draw out the real concern.
 
-> "I see [this code] in `path/to/file.ext:LINE–LINE`. It looks like [describe the smell: hack, TODO, swallowed error, type suppression, copy-paste, outdated API, etc.]. Is this a temporary workaround we tolerate, or a sign of a deeper problem we want to **codify as forbidden** in the future? How should we write this *ideally* so that no future Claude session ever regenerates code in this style?"
+**Minimum counts per run of the command:**
 
-This is the mechanism by which real flaws in the current code become explicit Prohibitions in `dev-rules.md`. The number `3` is a floor, not a ceiling — if the repo is rich in tech debt, surface more.
+- **At least 3 positive-pattern questions.** These use `AskUserQuestion` to confirm or refine a pattern the agent has identified as exemplary. The agent lifts a real snippet from the repo, presents it as `// GOOD (candidate ideal)`, and asks the maintainer to pick: "this is the ideal as-is", "ideal with this nuance", or "this is an exception, not the rule". Options must vary in **wording or scope**, never in **semantics** — the maintainer should not be choosing between conflicting answers, only between phrasings of the same answer.
+- **At least 1 negative-pattern question.** These stay in Socratic mode: a real snippet with a smell, one open question, prose answer. The bar is low because the cognitive load on the maintainer is high; the asymmetric minimum keeps the dialogue humane.
+
+The numbers are floors, not ceilings — a rich repo surfaces more of both.
+
+**The mechanism for positive-pattern questions:**
+
+> *I see this in `path/to/file.ext:LINE–LINE`, and I think it captures something we want to preserve:*
+> ```[language]
+> // GOOD (candidate ideal)
+> [real or distilled snippet]
+> ```
+> Then call `AskUserQuestion` with options such as:
+> - "Yes, this is the ideal — codify it as Form C / ✅ side of Form B"
+> - "Yes, with this nuance: [one-line refinement from the maintainer]"
+> - "This is an exception, not the rule — the rule is more general"
+
+A positive-pattern question that comes back with the third option ("this is an exception") is still valuable: it tells the agent where the real rule lives elsewhere, and where the boundary is.
 
 ### Discipline D — Dynamic branching
 
@@ -174,10 +191,11 @@ The user can issue any of the following at any point during the interview. **Hon
 
 When the user signals completion, OR when you believe the major themes are covered and the recent exchanges have been small refinements, do the following in order:
 
-1. **Summarize first.** Produce a 5–8 line summary in two buckets — **North Star** (principles) and **Rules** (with the form A/B/C/D noted for each). This is the user's **last chance to correct a misunderstanding** before you write the file.
-2. **Wait for confirmation.** The user may say "yes, write it", or they may correct a misquote, add a missed principle, or ask for one more question. Do not write the file before they confirm.
-3. **Write the file.** Create or overwrite `./dev-rules.md` at the repository root using `Write`.
-4. **Read it back.** Show the final file path and the section headings. End with exactly one line:
+1. **Self-prune.** Walk every candidate rule. For each: can it be said in 2–3 sentences before the snippet without losing meaning? If not, propose a denser phrasing alongside the original in the summary. The goal is **concise** — multi-clause rules with exception clauses stay multi-clause; rules that ramble get cut. This is a soft recommendation, not a hard limit.
+2. **Summarize first.** Produce a 5–8 line summary in two buckets — **North Star** (principles) and **Rules** (with the form A/B/C/D noted for each). This is the user's **last chance to correct a misunderstanding** before you write the file.
+3. **Wait for confirmation.** The user may say "yes, write it", or they may correct a misquote, add a missed principle, or ask for one more question. Do not write the file before they confirm.
+4. **Write the file.** Create or overwrite `./dev-rules.md` at the repository root using `Write`.
+5. **Read it back.** Show the final file path and the section headings. End with exactly one line:
 
 > **This file is now law. Future Claude Code sessions and human contributors will be guided by it.**
 
@@ -203,7 +221,7 @@ The file MUST follow this exact top-level structure, in this order, with these e
 > Use when the GOOD is obvious or context-dependent and a paired example would be boilerplate.
 
 ```markdown
-- **❌ [Anti-pattern name]**: [Why forbidden].
+- **❌ [Anti-pattern name]**: [Why forbidden]. *(Target 2–3 sentences; the snippet carries the rest.)*
   ```[language]
   // BAD (distilled MRE)
   [self-contained minimal snippet that does not reference any file in this repo]
@@ -215,12 +233,12 @@ The file MUST follow this exact top-level structure, in this order, with these e
 > Use when a paired example is meaningful. Both sides are copy-pasteable starting points.
 
 ```markdown
-- **❌ [Anti-pattern name]**: [Why forbidden].
+- **❌ [Anti-pattern name]**: [Why forbidden]. *(Target 2–3 sentences; the snippet carries the rest.)*
   ```[language]
   // BAD (distilled MRE)
   [self-contained minimal snippet that does not reference any file in this repo]
   ```
-- **✅ [Ideal name]**: [What the right way looks like, in one sentence].
+- **✅ [Ideal name]**: [What the right way looks like, in one sentence]. *(Target 2–3 sentences; the snippet carries the rest.)*
   ```[language]
   // GOOD
   [idealized snippet]
@@ -232,7 +250,7 @@ The file MUST follow this exact top-level structure, in this order, with these e
 > Use for positive-only conventions where there is no specific anti-pattern to call out.
 
 ```markdown
-- **✅ [Imperative rule]**: [Why this is the way].
+- **✅ [Imperative rule]**: [Why this is the way]. *(Target 2–3 sentences; the snippet carries the rest.)*
   ```[language]
   // GOOD
   [idealized snippet]
@@ -244,7 +262,7 @@ The file MUST follow this exact top-level structure, in this order, with these e
 > Use when the rule is best expressed as prose — multi-sentence, with explicit exception clauses, where the bullet+snippet structure of Forms A/B/C would lose meaning or feel forced. Pick this form when the rule covers a whole architectural area, a workflow, or a layered convention. **The rule is binding; the prose is the rule, not a softener.**
 
 ```markdown
-- **📜 [Rule name]**: [The rule, expressed as a paragraph or two. State the principle, the constraints, and any explicit exception clauses inline.]
+- **📜 [Rule name]**: [The rule, expressed as a paragraph or two. State the principle, the constraints, and any explicit exception clauses inline. *Prose is the rule; do not pad.*]
 
   *(Optional supporting snippet — include only when the prose references a specific shape that would be ambiguous without an example, e.g. a config file structure, a test layout, or a module skeleton.)*
   ```[language]
@@ -286,8 +304,8 @@ Rules for this section:
 3. **Never pre-empt the user's answer.** Don't say "do you agree?" — let them speak first.
 4. **Never document the current state.** The output is the *ideal* state, not a snapshot of the code.
 5. **Never invent a principle the user did not state.** If the user has not addressed an area, do not write rules for it. Leave gaps. The maintainer can re-run the command to fill them.
-6. **Never skip the anti-pattern surfacing phase.** At least 3 questions must be of the "is this a hack or a pattern?" form, with real code from the repo.
-7. **Never use multi-choice dialogs.** The dialogue is free-form prose. Multiple-choice is a violation of the Socratic method here.
+6. **Never skip pattern surfacing.** At least 3 questions must be positive-pattern confirmations (`AskUserQuestion` on an exemplary snippet), and at least 1 must be a negative-pattern Socratic probe (open question on a real smell). The numbers are floors.
+7. **Never use multi-choice for negative-pattern questions in Phase 2.** Positive-pattern questions use `AskUserQuestion` to confirm or refine. Negative-pattern questions stay Socratic — one open question, free-form prose, the maintainer's pain is the signal.
 8. **Never write the file before the user has confirmed.** Show the summary first, then write.
 9. **Never overwrite a prior `dev-rules.md` silently.** Read it, mention it, and ask the user whether to replace, merge, or extend.
 10. **Never use filler.** No "I hope this helps", "Great question!", "Excellent point!". Stay direct.
