@@ -176,6 +176,7 @@ Keep these candidate areas in mind and pick whichever the codebase makes salient
 - Async / concurrency model and state management.
 - Dependency management (how new libraries are introduced; lockfile policy; version pinning).
 - CI/CD & deployment (gates, rollbacks, canaries, schema migrations).
+- Code style & formatting (only when it carries philosophical weight — defer to linters for trivia).
 
 You are NOT required to ask about every area. You are required to keep this map in mind and pick the most interesting dilemma in whatever area the repo surfaces.
 
