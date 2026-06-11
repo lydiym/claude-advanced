@@ -1,6 +1,6 @@
 ---
 description: Set up or refresh ./dev-rules.md by codifying the maintainer's "sense of beauty" via a code-driven Socratic dialogue. Use when a user wants to "set up our style guide", "define our coding conventions", "codify best practices for this project", "what are our coding rules", or runs /setup-dev-rules.
-allowed-tools: Read, Glob, Grep, Write, Edit, AskUserQuestion
+allowed-tools: Read, Glob, Grep, Write, Edit, AskUserQuestion, Bash
 ---
 
 # ROLE
@@ -27,7 +27,7 @@ Scan in this order:
 
 1. **Tech stack.** Read `package.json`, `requirements.txt` / `pyproject.toml`, `Cargo.toml`, `go.mod`, `Gemfile`, `pom.xml` / `build.gradle`, or equivalent. Note the language(s), framework(s), runtime(s), and package manager.
 2. **Project structure.** List the top-level directories. Identify the source, test, config, deploy, and docs folders. Note any monorepo, workspace, or microservice patterns.
-3. **Configs & infrastructure.** Read `Dockerfile`, `docker-compose.yml`, CI files (`.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`, `.circleci/`), IaC (Terraform, Pulumi, Helm), and any environment templating (`.env.example`, `config/*.yaml`).
+3. **Configs & infrastructure.** Read `Dockerfile`, `docker-compose.yml`, CI files (`.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`, `.circleci/`), IaC (Terraform, Pulumi, Helm), and any environment templating (`.env.example`, `config/*.yaml`). **Also identify the linter(s) the project uses** (ESLint, Prettier, ruff, flake8, mypy, clippy, golangci-lint, RuboCop, ktlint, etc.) and read their config files — rules that can be linter-expressed will need to be recorded there in Phase 3, per Hard Rule #13.
 4. **Database & persistence.** Identify the engine, ORM/query layer, migration tool, seed scripts, and connection-pooling conventions.
 5. **Testing strategy.** Locate unit, integration, e2e, and contract tests. Note the framework, fixture style, mock policy.
 6. **Representative code.** Read 3–5 files spanning core domain logic, glue code, error handling, async/concurrency, and tests. Note exemplary patterns first (these will become positive patterns), and deviations second.
@@ -97,6 +97,7 @@ Positive patterns carry the maintainer's "sense of beauty" — they are the main
 **Minimum counts per run of the command:**
 
 - **At least 3 positive-pattern questions.** These use `AskUserQuestion` to confirm or refine a pattern the agent has identified as exemplary. The agent lifts a real snippet from the repo, presents it as `// GOOD (candidate ideal)`, and asks the maintainer to pick: "this is the ideal as-is", "ideal with this nuance", or "this is an exception, not the rule". Options must vary in **wording or scope**, never in **semantics** — the maintainer should not be choosing between conflicting answers, only between phrasings of the same answer.
+- **At least 1 open positive question (request a snippet).** When the agent doesn't yet have a strong candidate for a pattern the maintainer clearly cares about — or when the pattern is *desired* but not yet present in the code — ask openly: "please add a snippet demonstrating a good approach, or point me to a fragment of code in the project — I will highlight the key points." Open prose, **never multi-choice**. Once the maintainer provides material, the agent extracts the key patterns, drafts a candidate rule, and surfaces it via live confirmation (in "Capturing answers").
 - **At least 1 negative-pattern question.** These stay in Socratic mode: a real snippet with a smell, one open question, prose answer. The bar is low because the cognitive load on the maintainer is high; the asymmetric minimum keeps the dialogue humane.
 
 The numbers are floors, not ceilings — a rich repo surfaces more of both.
@@ -114,6 +115,20 @@ The numbers are floors, not ceilings — a rich repo surfaces more of both.
 > - "This is an exception, not the rule — the rule is more general"
 
 A positive-pattern question that comes back with the third option ("this is an exception") is still valuable: it tells the agent where the real rule lives elsewhere, and where the boundary is.
+
+**The mechanism for open positive questions (request a snippet):**
+
+> **[Question number or theme].** *I don't yet have a clean example of [pattern] in the current code. Could you either:*
+> - *paste a synthetic snippet of your ideal approach, OR*
+> - *point me to a file/line in the project that captures it?*
+>
+> *(Open prose — the maintainer contributes the material, the agent extracts the rule. No multi-choice.)*
+
+Once the maintainer provides the material (pasted snippet or `path/to/file.ext:LINE` reference), the agent:
+1. Reads the snippet (or the referenced file) carefully.
+2. Identifies the 2–4 key patterns that make it exemplary.
+3. Drafts a candidate rule, applying the appropriate Form (A/B/C/D) and assessing whether the rule can be linter-expressed (see "Capturing answers" and Hard Rule #13).
+4. Surfaces the candidate via the live-confirmation step in "Capturing answers".
 
 ### Capturing answers
 
@@ -178,10 +193,11 @@ The user can issue any of the following at any point during the interview. **Hon
 When the user signals completion, OR when you believe the major themes are covered and the recent exchanges have been small refinements, do the following in order:
 
 1. **Self-prune.** Walk every candidate rule. For each: can it be said in 2–3 sentences before the snippet without losing meaning? If not, propose a denser phrasing alongside the original in the summary. The goal is **concise** — multi-clause rules with exception clauses stay multi-clause; rules that ramble get cut. This is a soft recommendation, not a hard limit.
-2. **Summarize first.** Produce a 5–8 line summary in two buckets — **North Star** (principles) and **Rules** (with the form A/B/C/D noted for each). This is the user's **last chance to correct a misunderstanding** before you write the file.
+2. **Summarize first.** Produce a 5–8 line summary in two buckets — **North Star** (principles) and **Rules** (with the form A/B/C/D noted for each). For every rule, also note whether it **can be linter-expressed** in the project's linter (ESLint, Prettier, ruff, mypy, clippy, golangci-lint, RuboCop, ktlint, etc.). This is the user's **last chance to correct a misunderstanding** before you write the file.
 3. **Wait for confirmation.** The user may say "yes, write it", or they may correct a misquote, add a missed principle, or ask for one more question. Do not write the file before they confirm.
-4. **Write the file.** Create or overwrite `./dev-rules.md` at the repository root using `Write`.
-5. **Read it back.** Show the final file path and the section headings. End with exactly one line:
+4. **Translate mechanical rules to linter config.** For each rule flagged as linter-expressible, generate the config snippet the linter expects (e.g., an ESLint `no-console` entry, a ruff `select = ["E", "F"]` block, a clippy `disallowed-methods` entry). **Show the proposed diff to the maintainer, get explicit confirmation, then write the linter config** using `Edit` or `Write`. This step is required by Hard Rule #13 — a rule that can be linted must be linted, not just documented. The linter config is the canonical record of mechanical enforcement; `dev-rules.md` only references it. If the linter provides a config-validation command (`eslint --print-config`, `ruff check --no-fix`, etc.), run it after writing to confirm the config is valid.
+5. **Write the file.** Create or overwrite `./dev-rules.md` at the repository root using `Write`. Each rule flagged as linter-expressible gets an inline tag pointing to the linter rule (see "Output structure" below).
+6. **Read it back.** Show the final file paths (the `.md` and any modified linter configs) and the section headings. End with exactly one line:
 
 > **This file is now law. Future Claude Code sessions and human contributors will be guided by it.**
 
@@ -257,6 +273,21 @@ The file MUST follow this exact top-level structure, in this order, with these e
   ```
 ```
 
+### Linter enforcement
+
+For each rule that can be expressed in the project's linter, add an inline tag pointing to the linter rule and the config file. The linter config is the canonical record of mechanical enforcement; the `.md` is a human-readable index.
+
+```markdown
+- **❌ Console.log in production paths**: ...
+  *(Enforced by ESLint `no-console` — see `eslint.config.js`.)*
+- **✅ Prefer composition over inheritance**: ...
+  *(Enforced by ESLint `max-classes-per-file` — see `eslint.config.js`.)*
+- **📜 Service layer must not import from the transport layer**: ...
+  *(Architectural rule — not linter-expressible; relies on code review.)*
+```
+
+A rule that *can* be linter-expressed and *isn't* tagged is a violation of Hard Rule #13. A rule that *cannot* be linter-expressed (e.g., a Form D prose rule about layering or review culture) needs no tag — its absence is informative, not a gap.
+
 ### Snippet rules
 
 **Snippets in `dev-rules.md` MUST be self-contained and MUST NOT reference any specific file in the repository** (no filename, no line number). The file outlives the code; only the lesson survives. During the dialogue, the agent may reference `path/to/file.ext:LINE` to anchor a question — that reference is conversation context, not part of the recorded rule.
@@ -300,5 +331,6 @@ The priority in the tag **is** the ordering — most urgent questions come first
 12. **Never bridge or extrapolate.** Two prohibitions in one:
     - **No inferring unstated preferences.** Do not connect two of the maintainer's stated points with a bridge like "and probably you also want X". If the maintainer has not stated it, ask — do not assume.
     - **No unconfirmed rules in the file.** A rule lands in `## 1` or `## 2` only if (a) the maintainer stated the underlying preference in answer to a code-driven question, AND (b) the wording was confirmed through live confirmation. In Phase 3, before writing the file, the agent MUST walk every candidate rule through this two-part filter. Anything that fails is dropped, surfaced in the summary as "heard but not confirmed — please rephrase or drop", or moved to `## 4. Open Questions` with `Candidate direction` clearly marked as unconfirmed. A rule that "sounds right" but was never confirmed is forbidden in the file.
+13. **Make lintable rules live in the linter, not just in the doc.** If a rule derived during the interview can be expressed in the project's linter (ESLint, Prettier, ruff, flake8, mypy, clippy, golangci-lint, RuboCop, ktlint, etc.), it MUST be recorded in that linter's config file — in addition to (or instead of) appearing in `dev-rules.md` — so the rule becomes **applicable and live from the moment of recording**, not a passive paragraph that future contributors can ignore. Documentation without enforcement is opinion; documentation *with* enforcement is law. The agent detects the project's linter in Phase 0, flags which rules are linter-expressible in Phase 3 step 2, writes the linter config in Phase 3 step 4 (with explicit maintainer confirmation), and tags the corresponding entries in `dev-rules.md` (see "Output structure" → "Linter enforcement"). A Form D prose rule that cannot be linter-expressed is exempt — its absence of a linter tag is expected, not a gap.
 
 Start now: Phase 0 (silent scan), then Phase 1 (the opening paragraph), then your first code-driven question.
